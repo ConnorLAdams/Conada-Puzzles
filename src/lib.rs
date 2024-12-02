@@ -32,8 +32,28 @@ impl Planes {
         }
     }
 
-    fn run_simulation(&self, _iterations: u64) -> f64 {
-        3.14
+    fn run_simulation(&self, iterations: u64) -> f64 {
+        let mut num_successes: i64 = 0;
+        for _ in 0..iterations {
+            let seating = self.generate_seating();
+            let mut open_seats = Vec::from_iter(seating.values().cloned());
+            let mut seat: String = "".to_string();
+            for p in 1..=self.passengers {
+                if p == 1 || !open_seats.contains(seating.get(&p).unwrap()) {
+                    seat = open_seats.choose(&mut thread_rng()).unwrap().to_string();
+                    let index = open_seats.iter().position(|x| *x == seat).unwrap();
+                    open_seats.remove(index);
+                } else {
+                    seat = seating.get(&p).unwrap().to_string();
+                    let index = open_seats.iter().position(|x| *x == seat).unwrap();
+                    open_seats.remove(index);
+                }
+            }
+            if seating.get(&self.passengers).unwrap() == &seat {
+                num_successes += 1;
+            }
+        }
+        num_successes as f64 / iterations as f64
     }
     
     fn generate_seating(&self) -> HashMap<u64, String> {
@@ -42,8 +62,12 @@ impl Planes {
         for i in 0..self.seats {
             available_seats.push(format!("{}{}", (i+6 / 6), self.cols.get((i % 6) as usize).unwrap()));
         }
+
+        // Randomize the seating
         let mut rng = thread_rng();
         available_seats.shuffle(&mut rng);
+
+        // Assign seating
         let mut seating = HashMap::new();
         for i in 1..=self.passengers {
             seating.insert(i, available_seats.get((i-1) as usize).expect("Seat on a plane").to_string());
