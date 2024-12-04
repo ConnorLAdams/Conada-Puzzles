@@ -112,7 +112,7 @@ impl Clone for Planes {
 
 /// A Python module implemented in Rust.
 #[pymodule]
-fn puzzles(m: &Bound<'_, PyModule>) -> PyResult<()> {
+fn conada_puzzles(m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_class::<Planes>()?;
     Ok(())
 }
