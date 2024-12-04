@@ -85,8 +85,12 @@ impl Planes {
         for i in 0..self.seats {
             available_seats.push(format!("{}{}", (i+6 / 6), self.cols.get((i % 6) as usize).unwrap()));
         }
+
+        // Randomize the seating
         let mut rng = thread_rng();
         available_seats.shuffle(&mut rng);
+
+        // Assign seating
         let mut seating = HashMap::new();
         for i in 1..=self.passengers {
             seating.insert(i, available_seats.get((i-1) as usize).expect("Seat on a plane").to_string());
